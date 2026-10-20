@@ -502,3 +502,9 @@ WHERE unit_price <= 0
    OR unit_price > 4500;
 ```
 -- Rather than automatically correcting prices, suspicious records were flagged for further business investigation. Potential pricing errors were isolated while preserving the original data for future validation. Unusually high or low unit prices may skew metrics such as average sales, revenue, and profitability. Outlier detection helps identify potential pricing errors in the system while preserving the original data for further review.
+
+## Project Continuation
+
+This repository focuses on data quality assessment and cleaning. The cleaned dataset was then used for business analysis and strategic recommendations.
+
+🔗 Next stage: 
