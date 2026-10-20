@@ -45,12 +45,9 @@ The objective of this project was to perform a complete analytical workflow cons
 4.	Exploratory business analysis.
 5.	Generation of actionable business recommendations.
 
+## <h1 align="center">DATA PROFILING</h1>
 
-
-
-## DATA PROFILING
-
-## 1. TABLE SIZE ASSESSMENT 
+## <h1 align="center">1. TABLE SIZE ASSESSMENT</h1>
 
 SELECT COUNT(*) FROM customers; -- 5150
 
@@ -66,7 +63,7 @@ SELECT COUNT(*) FROM inventory; -- 2000
 The dataset size is sufficient to perform meaningful data quality and business analyses.
 
 
-## 3. IDENTIFYING MISSING DATA AND SUSPICIOUS DATA
+## <h1 align="center">2. IDENTIFYING MISSING DATA AND SUSPICIOUS DATA</h1>
 
 ## -- MISSING PHONE NUMBERS WERE IDENTIFIED IN THE CUSTOMER DATABASE.
 ```
@@ -179,7 +176,7 @@ WHERE NOT EXISTS (SELECT 1 FROM products p WHERE p.product_id = oi.product_id);
 
 
 
-## 4. DATA STANDARDIZATION
+## <h1 align="center">3. DATA STANDARDIZATION</h1>
 
 ## -- INVENTORY DASHBOARD: contained leading and trailing spaces, resulting in inconsistent location names.
 
@@ -345,7 +342,8 @@ WHERE order_date ~ '^\d{2}/\d{2}/\d{4}$';
 -- Date values stored in formats DD.MM.YYYY and DD/MM/YYYY were converted to the ISO standard format YYYY-MM-DD to ensure consistency across the dataset and correct futher analysis.
 
 
-## 5. DUPLICATE REMOVAL AND CATEGORY STANDARDIZATION
+## <h1 align="center">4. DUPLICATE REMOVAL AND CATEGORY STANDARDIZATION</h1>
+
 
 ## -- CUSTOMERS DASHBOARD:  Identifying Duplicate Customer Email Addresses
 
@@ -503,7 +501,7 @@ WHERE unit_price <= 0
 ```
 -- Rather than automatically correcting prices, suspicious records were flagged for further business investigation. Potential pricing errors were isolated while preserving the original data for future validation. Unusually high or low unit prices may skew metrics such as average sales, revenue, and profitability. Outlier detection helps identify potential pricing errors in the system while preserving the original data for further review.
 
-## Project Continuation
+## <h1 align="center">Project Continuation</h1>
 
 This repository focuses on data quality assessment and cleaning. The cleaned dataset was then used for business analysis and strategic recommendations.
 
