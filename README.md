@@ -505,4 +505,4 @@ WHERE unit_price <= 0
 
 This repository focuses on data quality assessment and cleaning. The cleaned dataset was then used for business analysis and strategic recommendations.
 
-🔗 Next stage: 
+🔗 Next stage:  [SHOPFLOW-DATA-ANALYSIS](https://github.com/asiawaldoch/SHOPFLOW-DATA-ANALYSIS)
