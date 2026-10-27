@@ -110,6 +110,12 @@ dentify potential inventory management issues, and support future business verif
 update INVENTORY  set VERIFY_STOCK_QUANTITY = true where stock_quantity <= 0; 
 ```
 
+<p align="center">
+  <img src="images/MISSING STOCK QUANTITY.png" alt="MISSING-STOCK-QUANTITY">
+</p>
+
+
+
 ## --PRODUCTS DASHBOARD: INVALID PRODUCTS PRICE HAVE BEEN FOUND (<=0)
  ```
 select * from products p where p.unit_price <= 0; 
@@ -124,7 +130,7 @@ add column VERIFY_UNIT_PRICE BOOLEAN default false;
 UPDATE PRODUCTS set VERIFY_UNIT_PRICE = true where UNIT_PRICE <=0; 
 ```
 <p align="center">
-  <img src="images/INVALID-PRODUCTS-PRICE.png" alt="INVALID-PRODUCTS-PRICE">
+  <img src="images/unit-price.png" alt="unit-price">
 </p>
 
 ## -- ORDER_ITEMS DASHBOARD: ORDER_QUANTITY RESULTS ARE NEGATIVE
