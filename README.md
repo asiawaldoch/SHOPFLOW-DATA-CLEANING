@@ -52,17 +52,17 @@ The objective of this project was to perform a complete analytical workflow cons
 
 ## <h1 align="center">1. TABLE SIZE ASSESSMENT</h1>
 
-SELECT COUNT(*) FROM customers; -- 5150
-
-SELECT COUNT(*) FROM products; -- 2000
-
-SELECT COUNT(*) FROM orders; -- 20400
-
-SELECT COUNT(*) FROM order_items; -- 50000
-
-SELECT COUNT(*) FROM inventory; -- 2000
-
-
+```
+SELECT 'customers' AS tabela, COUNT(*) FROM customers
+UNION ALL
+SELECT 'products', COUNT(*) FROM products
+UNION ALL
+SELECT 'orders', COUNT(*) FROM orders
+UNION ALL
+SELECT 'order_items', COUNT(*) FROM order_items
+UNION ALL
+SELECT 'inventory', COUNT(*) FROM inventory;
+```
 The dataset size is sufficient to perform meaningful data quality and business analyses.
 
 
@@ -82,7 +82,7 @@ set PHONE = 'UNKNOWN'
 where PHONE is null or PHONE = '';
 ```
 
-## -—INVENTORY DASHBOARD: INFENTIFIED MISSING STOCK QUANTITY
+## -—INVENTORY DASHBOARD: IDENTIFIED MISSING STOCK QUANTITY
 ```
 select *
 from inventory i
