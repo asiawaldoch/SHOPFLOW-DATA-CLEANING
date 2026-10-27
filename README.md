@@ -109,9 +109,6 @@ dentify potential inventory management issues, and support future business verif
 ```
 update INVENTORY  set VERIFY_STOCK_QUANTITY = true where stock_quantity <= 0; 
 ```
-<p align="center">
-  <img src="images/MISSING-STOCK-QUANTITY.png" alt="MISSING-STOCK-QUANTITY">
-</p>
 
 ## --PRODUCTS DASHBOARD: INVALID PRODUCTS PRICE HAVE BEEN FOUND (<=0)
  ```
