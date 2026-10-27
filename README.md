@@ -63,7 +63,7 @@ SELECT 'order_items', COUNT(*) FROM order_items
 UNION ALL
 SELECT 'inventory', COUNT(*) FROM inventory;
 ```
-The dataset size is sufficient to perform meaningful data quality and business analyses.
+The table size assessment confirmed that all core business entities contain enough records for meaningful analysis. The dataset is suitable for identifying data quality issues, uncovering business insights, and creating dashboards based on sales, customers, products, and inventory data.
 
 
 ## <h1 align="center">2. IDENTIFYING MISSING DATA AND SUSPICIOUS DATA</h1>
@@ -81,6 +81,11 @@ update customers c
 set PHONE = 'UNKNOWN'
 where PHONE is null or PHONE = '';
 ```
+
+<p align="center">
+  <img src="images/1phone-unknown.png" alt="1phone-unknown">
+</p>
+
 
 ## -- INVENTORY DASHBOARD: IDENTIFIED MISSING STOCK QUANTITY
 ```
@@ -135,8 +140,13 @@ ALTER table order_items
 add column VERIFY_QUANTITY BOOLEAN default false;
 ```
 ```
-update ORDER_ITEMS set VERIFY_QUANTITY = true where QUANTITY < 0; 
+update ORDER_ITEMS set VERIFY_QUANTITY = true where QUANTITY < 0;
 ```
+
+<p align="center">
+  <img src="images/2quantity.png" alt="2quantity">
+</p>
+
 -- All suspicious records were flagged for future investigation rather than removed from the dataset.
 
 ## -- ORDERS DASHBOARD: Customers with no orders
@@ -146,7 +156,7 @@ FROM customers c
 LEFT JOIN orders o ON c.customer_id = o.customer_id
 WHERE o.order_id IS NULL;
 ```
--- Identifies customer accounts that have never placed an order. The results were saved as a view for further analysis and verification. 
+-- Identifies customer accounts that have never placed an order. The results were saved as a view for further analysis and verification and will be automatically updated. 
 ```
 CREATE VIEW klienci_bez_zamowien AS
 SELECT c.*
@@ -175,6 +185,12 @@ UPDATE order_items oi
 SET product_id = -1
 WHERE NOT EXISTS (SELECT 1 FROM products p WHERE p.product_id = oi.product_id);
 ```
+
+<p align="center">
+  <img src="images/3productid.png" alt="3productid">
+</p>
+
+
 --Some order items referenced products that were not present in the products table. To preserve historical sales records a placeholder product was created and assigned to orphaned records.
 
 
