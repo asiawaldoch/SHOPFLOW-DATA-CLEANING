@@ -211,9 +211,7 @@ SET warehouse_location = TRIM(warehouse_location);
 
 ## --CUSOMERS DASHBOARD: Customer email addresses contained inconsistencies such as:Uppercase letters, leading spaces, trailing spaces
 
-<p align="center">
-  <img src="images/EMAIL-CLEANING-BEFORE.png" alt="EMAIL-CLEANING-BEFORE">
-</p>
+
 
 ```
 SELECT * from CUSTOMERS where EMAIL <> LOWER(TRIM(EMAIL));
@@ -224,17 +222,12 @@ update CUSTOMERS set EMAIL = LOWER(TRIM(EMAIL));
 ```
 -- All email addresses were converted to lowercase and stripped of unnecessary spaces. Email standardization improves customer identification and reduces the risk of duplicate records caused by formatting differences or invalid analysis . 
 
- <p align="center">
-  <img src="images/EMAIL-CLEANING-AFTER.png" alt="EMAIL-CLEANING-AFTER">
-</p>
+
 
 
 ## -- CUSTOMERS DASHBOARD: Phone Number Standardization
 
- <p align="center">
-  <img src="images/PHONE-CLEANING-BEFORE.png" alt="PHONE-CLEANING-BEFORE">
-</p>
- 
+
 ```
 SELECT phone FROM customers WHERE phone <> 'unknown' AND phone !~ '^\+48\d{9}$';
 ```
@@ -247,15 +240,10 @@ and LENGTH(REGEXP_REPLACE(phone, '[^0-9]', '', 'g')) >= 9;
 -- Phone numbers were converted into a unified format: +48123456789
 Consistent phone number formatting improves customer communication and increases data reliability across CRM and marketing systems.
 
-  <p align="center">
-  <img src="images/PHONE-CLEANING-AFTER.png" alt="PHONE-CLEANING-AFTER">
-</p>
+  
 
 ## -- CUSTOMERS DASHBOARD: Postal Code Standardization (XX-XXX)
 
-  <p align="center">
-  <img src="images/POSTAL-CODE-BEFORE.png" alt="POSTAL-CODE-BEFORE">
-</p>
 
 ```
 select POSTAL_CODE from CUSTOMERS where postal_code !~ '^\d{2}-\d{3}$'; 
@@ -284,16 +272,11 @@ add column VERIFY_POSTAL_CODE BOOLEAN default false;
 ```
 update CUSTOMERS set VERIFY_POSTAL_CODE = true where postal_code !~ '^\d{2}-\d{3}$';
 ```
-  <p align="center">
-  <img src="images/POSTAL-CODE-AFTER.png" alt="POSTAL-CODE-AFTER">
-</p>
+
 
 
 ## -- CUSTOMERS DASHBOARD: City Name Standardization
 
- <p align="center">
-  <img src="images/CITY-NAME-BEFORE.png" alt="CITY-NAME-BEFORE">
-</p>
 
  ```
 select CITY, COUNT(*)
@@ -342,9 +325,7 @@ where LOWER(C.CITY) = CITY_MAPPING.WARIANT;
 -- All detected city name variations were standardized to a single canonical version.
 City normalization enables accurate geographic analysis
 
-  <p align="center">
-  <img src="images/CITY-NAME-AFTER.png" alt="CITY-NAME-AFTER">
-</p>
+
 
 ## -- ORDERS DASHBOARD: DATE STANDARDIZATION
 ```
@@ -369,12 +350,7 @@ WHERE order_date ~ '^\d{2}/\d{2}/\d{4}$';
 
 ## -- CUSTOMERS DASHBOARD:  Identifying Duplicate Customer Email Addresses
 
-  <p align="center">
-  <img src="images/EMAIL-DUPLICATES-BEFORE.png" alt="EMAIL-DUPLICATES-BEFORE">
-</p>
-  <p align="center">
-  <img src="images/EMAIL-DUPLICATES-AFTER.png" alt="EMAIL-DUPLICATES-AFTER">
-</p>
+
 
 ```
 SELECT customer_id, email, registration_date 
@@ -435,9 +411,7 @@ HAVING COUNT(*) > 1;
 
 ## -- CUSTOMERS DASHBOARD: While investigating duplicate phone numbers, several customer accounts were discovered with email addresses containing the suffix: _dup
 
- <p align="center">
-  <img src="images/EMAIL-DUPLICATES-WITH_DUP.png" alt="EMAIL-DUPLICATES-WITH_DUP">
-</p>
+
 
  ```
 SELECT *
@@ -475,9 +449,7 @@ WHERE email ILIKE '%_dup@%';
 All unnecessary duplicate customer records were removed while maintaining order integrity.
 ## -- PROCUDTS DASHBOARD: Product Category Standardization
 
- <p align="center">
-  <img src="images/CAETGORIES-BEFORE.png" alt="CAETGORIES-BEFORE">
-</p>
+
 
 ```
 SELECT DISTINCT category 
@@ -502,9 +474,6 @@ UPDATE products SET category = 'Akcesoria'     WHERE LOWER(TRIM(category)) = 'ak
 ```
 -- All category names were standardized into a single business-approved taxonomy. Category-level reporting became consistent and reliable. Non-standardized categories can lead to inaccurate analyses and misleading business conclusions. For example, metrics such as profit, revenue, return rates, or sales performance by category may be distorted if products are assigned inconsistently across categories.
 
- <p align="center">
-  <img src="images/CAETGORIES-AFTER.png" alt="CAETGORIES-AFTER">
-</p>
  
 ## -- PRODUCTS DASHBOARD: Outlier Price Detection
 
