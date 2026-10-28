@@ -74,8 +74,10 @@ SELECT *
 FROM customers
 WHERE PHONE IS null OR PHONE = ''; 
 ```
--- At this stage, phone numbers were not removed or artificially completed because there was insufficient information to determine the correct values.
-Records were temporarily marked as "UNKNOWN" and flagged for future business verification. Maintaining these records preserves potentially valuable customer information while ensuring data transparency. Correct phone numbers may improve customer service, marketing effectiveness, and communication quality.
+-- At this stage, I didn't remove phone numbers because there was insufficient information to determine the correct values.
+Records were temporarily marked as "UNKNOWN" and flagged for future business verification. <br>
+In the future collecting correct phone numbers may improve customer service, marketing effectiveness, and communication quality. In the next steps I will be cleaning phone number format.
+
 ```
 update customers c 
 set PHONE = 'UNKNOWN'
@@ -86,26 +88,23 @@ where PHONE is null or PHONE = '';
   <img src="images/1phone-unknown.png" alt="1phone-unknown">
 </p>
 
-
 ## -- INVENTORY DASHBOARD: IDENTIFIED MISSING STOCK QUANTITY
-```
-select *
-from inventory i
-where i.stock_quantity <=0; 
-```
--- Products with inventory levels equal to or below zero were detected. 
+
 ```
 select COUNT(i.stock_quantity)
 from inventory i
-where i.stock_quantity <=0; 
+where i.stock_quantity <=0;
+
 ```
--- 126 affected records 
+-- Products with inventory levels equal to or below zero were detected. In details, 126 affected records.
+
 ```
 alter table inventory 
 add column VERIFY_STOCK_QUANTITY BOOLEAN default false; 
 ```
--- Adding the VERIFY_STOCK_QUANTITY flag allows suspicious records to be tracked and reviewed in later stages of the analysis. This helps investigate why products have zero or negative stock levels,
-dentify potential inventory management issues, and support future business verification.
+-- Adding the VERIFY_STOCK_QUANTITY flag allows me to truck suspicious records and review in later stages of the analysis. This helps investigate why products have zero or negative stock levels, indentify potential inventory management issues, and support future business verification.<br>
+Stock quantities below zero may indicate inventory discrepancies, data entry errors, or stock management issues. These records should be investigated further in the next stages of the analysis to determine the root cause and assess their business impact.
+
 ```
 update INVENTORY  set VERIFY_STOCK_QUANTITY = true where stock_quantity <= 0; 
 ```
@@ -114,18 +113,16 @@ update INVENTORY  set VERIFY_STOCK_QUANTITY = true where stock_quantity <= 0;
   <img src="images/MISSING STOCK QUANTITY.png" alt="MISSING-STOCK-QUANTITY">
 </p>
 
-
-
 ## --PRODUCTS DASHBOARD: INVALID PRODUCTS PRICE HAVE BEEN FOUND (<=0)
  ```
 select * from products p where p.unit_price <= 0; 
 ```
--- Products with prices equal to zero or below zero were identified.
+-- I identified products with prices equal to zero or below zero.
 ```
 ALTER table PRODUCTS
 add column VERIFY_UNIT_PRICE BOOLEAN default false; 
 ```
--- Products with invalid prices were not removed. Instead, they were marked for further business investigation.  This allows suspicious records to be reviewed later, helping identify potential pricing errors or data entry issues .
+-- I didn't remove products with invalid prices. Instead, I marked them for further business investigation. This allows suspicious records to be reviewed later, helping identify potential pricing errors or data entry issues.
 ```
 UPDATE PRODUCTS set VERIFY_UNIT_PRICE = true where UNIT_PRICE <=0; 
 ```
@@ -137,7 +134,7 @@ UPDATE PRODUCTS set VERIFY_UNIT_PRICE = true where UNIT_PRICE <=0;
 ```
 select * from order_items oi where oi.quantity <0; 
 ```
--- Negative order quantities were detected in the order items table. Possibile explanations: product returns, refund processing, incorrect transaction data
+-- I detected negative order quantities in the order items table. Possibile explanations: product returns, refund processing, incorrect transaction data
 ```
 ALTER table order_items 
 add column VERIFY_QUANTITY BOOLEAN default false;
@@ -159,7 +156,10 @@ FROM customers c
 LEFT JOIN orders o ON c.customer_id = o.customer_id
 WHERE o.order_id IS NULL;
 ```
--- Identifies customer accounts that have never placed an order. The results were saved as a view for further analysis and verification and will be automatically updated. 
+-- I identified customer accounts that have never placed an order. The results were saved as a view for further analysis and verification and will be automatically updated.<br>
+
+These customers should be analyzed further to understand why they have not placed any orders. The company may consider targeted marketing campaigns or special offers to encourage them to make their first purchase.
+
 ```
 CREATE VIEW klienci_bez_zamowien AS
 SELECT c.*
@@ -178,7 +178,7 @@ FROM order_items oi
 LEFT JOIN products p ON oi.product_id = p.product_id
 WHERE p.product_id IS NULL;
 ```
--- Identifies order items that reference products not present in the products table.
+-- I identified order items that reference products that are not present in the products table.
 ```
 INSERT INTO products (product_id, product_name, category, brand, unit_price, unit_cost, is_active)
 VALUES (-1, 'Produkt zarchiwizowany / brak danych', 'Nieznana', 'Nieznana', 0, 0, FALSE);
@@ -193,10 +193,7 @@ WHERE NOT EXISTS (SELECT 1 FROM products p WHERE p.product_id = oi.product_id);
   <img src="images/3productid.png" alt="3productid">
 </p>
 
-
---Some order items referenced products that were not present in the products table. To preserve historical sales records a placeholder product was created and assigned to orphaned records.
-
-
+-- Missing products should be verified and investigated to determine the cause of the issue. These records may indicate deleted products, incomplete data migrations, or data integrity problems between tables. Further analysis is recommended to assess the impact on reporting and business operations.
 
 ## <h1 align="center">3. DATA STANDARDIZATION</h1>
 
@@ -206,27 +203,33 @@ WHERE NOT EXISTS (SELECT 1 FROM products p WHERE p.product_id = oi.product_id);
 UPDATE inventory
 SET warehouse_location = TRIM(warehouse_location);
 ```
--- All warehouse location values were standardized by removing unnecessary spaces in order to track valid data and correct analysis.
+-- All warehouse location values were standardized by removing unnecessary spaces. This helps maintain consistent data and improves the accuracy of future analysis and reporting.
 
 
-## --CUSOMERS DASHBOARD: Customer email addresses contained inconsistencies such as:Uppercase letters, leading spaces, trailing spaces
+## --CUSOMERS DASHBOARD: Customer email addresses contained inconsistencies such as: Uppercase letters, leading spaces, trailing spaces
 
-
+<p align="center">
+  <img src="images/EMAIL CLEANING BEFORE.png" alt="EMAIL-CLEANING-BEFORE">
+</p>
 
 ```
 SELECT * from CUSTOMERS where EMAIL <> LOWER(TRIM(EMAIL));
 ```
--- Identifying the Issue
+-- I identified inconsistencies inbetween mail format.
 ```
 update CUSTOMERS set EMAIL = LOWER(TRIM(EMAIL)); 
 ```
--- All email addresses were converted to lowercase and stripped of unnecessary spaces. Email standardization improves customer identification and reduces the risk of duplicate records caused by formatting differences or invalid analysis . 
+-- I converted email addresses to lowercase and stripped of unnecessary spaces. Email standardization improves customer identification and reduces the risk of duplicate records caused by formatting differences or invalid analysis. 
 
-
-
+ <p align="center">
+  <img src="images/EMAIL CLEANING AFTER.png" alt="EMAIL-CLEANING-AFTER">
+</p>
 
 ## -- CUSTOMERS DASHBOARD: Phone Number Standardization
 
+ <p align="center">
+  <img src="images/PHONE CLEANING BEFORE.png" alt="PHONE-CLEANING-BEFORE">
+</p>
 
 ```
 SELECT phone FROM customers WHERE phone <> 'unknown' AND phone !~ '^\+48\d{9}$';
@@ -238,25 +241,39 @@ where PHONE <> 'UNKNOWN'
 and LENGTH(REGEXP_REPLACE(phone, '[^0-9]', '', 'g')) >= 9; 
 ```
 -- Phone numbers were converted into a unified format: +48123456789
-Consistent phone number formatting improves customer communication and increases data reliability across CRM and marketing systems.
+Consistent phone number formatting improves customer communication and marketing systems. 
+In order to collect phone numbers in a consistent format, the issue should be forwarded to the IT department so that the website validation rules can be improved. This would also be useful if the company expands to other countries, as it would help ensure that phone numbers are collected in valid and standardized formats. 
 
-  
+For example:
+
+Phone Number
+
+[ +48-123-456-789 ]
+
+✔ Expected format: +48-123-456-789
+
+ <p align="center">
+  <img src="images/PHONE CLEANING AFTER.png" alt="PHONE CLEANING AFTER">
+</p>
 
 ## -- CUSTOMERS DASHBOARD: Postal Code Standardization (XX-XXX)
+
+  <p align="center">
+  <img src="images/POSTAL CODE BEFORE.png" alt="POSTAL-CODE-BEFORE">
+</p>
 
 
 ```
 select POSTAL_CODE from CUSTOMERS where postal_code !~ '^\d{2}-\d{3}$'; 
 ```
--- Identifying Invalid Postal Codes
+-- I identified invalid Postal Codes
 
 ```
 update customers
 set POSTAL_CODE = null
 where POSTAL_CODE = '00000'; 
 ```
--- Placeholder values such as were replaced with NULL because they do not represent valid postal codes.
-
+-- I replaced invalid postal codes with NULL because there was insufficient information to determine the correct postal code.
 ```
 SELECT COUNT(*), postal_code
 FROM customers
@@ -268,14 +285,23 @@ GROUP BY postal_code;
 ALTER table customers 
 add column VERIFY_POSTAL_CODE BOOLEAN default false; 
 ```
--- Because there was insufficient information to determine the correct values, these records were flagged for future verification. Correct postal code can improve delivering process.
+-- Since the correct values could not be identified, these records were flagged for future verification using the VERIFY_POSTAL_CODE column.<br>
+
+Collecting accurate postal code data would improve future analyses, such as identifying key customer locations, understanding regional demand patterns, and supporting delivery and logistics planning.
 ```
 update CUSTOMERS set VERIFY_POSTAL_CODE = true where postal_code !~ '^\d{2}-\d{3}$';
 ```
 
+  <p align="center">
+  <img src="images/POSTAL CODE AFTER.png" alt="POSTAL-CODE-AFTER">
+</p>
 
 
 ## -- CUSTOMERS DASHBOARD: City Name Standardization
+
+ <p align="center">
+  <img src="images/CITY NAME BEFORE.png" alt="CITY NAME BEFORE">
+</p>
 
 
  ```
@@ -284,15 +310,14 @@ from CUSTOMERS
 group by city 
 order by CITY desc; 
 ```
--- The city column contained numerous inconsistencies: Typographical errors, different capitalization, duplicate city names
-Examples:
-warszawa
-Warszawa
-warszaawa
-warszzawa
-warszawa
+-- I identified numerous inconsistencies in "city" column such as: Typographical errors, different capitalization, duplicate city names<br>
+Examples:<br>
+"warszawa<br>
+Warszawa<br>
+warszaawa<br>
+warszzawa<br>
+warszawa"<br>
 These values all referred to the same city.
-
 
 ```
 CREATE TABLE city_mapping (
@@ -300,7 +325,7 @@ CREATE TABLE city_mapping (
   kanoniczna  VARCHAR(50)
 );
 ```
--- A reference table (wariant)was created to map incorrect city names to a standardized business-approved version (kanoniczna)
+-- I created a reference table (wariant) to map incorrect city names to a standardized business-approved version (kanoniczna)
 
 ```
 INSERT INTO city_mapping (wariant, kanoniczna) VALUES
@@ -323,15 +348,18 @@ from CITY_MAPPING
 where LOWER(C.CITY) = CITY_MAPPING.WARIANT; 
 ```
 -- All detected city name variations were standardized to a single canonical version.
-City normalization enables accurate geographic analysis
+City normalization enables accurate geographic analysis and will support my futher analysis in order to identify the main business locations, key customer areas, and regional market opportunities.
 
+  <p align="center">
+  <img src="images/CITY NAME AFTER.png" alt="CITY NAME AFTER">
+</p>
 
 
 ## -- ORDERS DASHBOARD: DATE STANDARDIZATION
 ```
 SELECT order_date FROM orders WHERE order_date !~ '^\d{4}-\d{2}-\d{2}$' LIMIT 20;
 ```
--- The order_date column contained multiple date formats, which could lead to inconsistencies and errors during analysis
+-- The order_date column contained multiple date formats, which could lead to inconsistencies and errors during my futher analysis.
 ```
 UPDATE orders
 SET order_date = TO_CHAR(TO_DATE(order_date, 'DD.MM.YYYY'), 'YYYY-MM-DD')
@@ -342,14 +370,18 @@ UPDATE orders
 SET order_date = TO_CHAR(TO_DATE(order_date, 'DD/MM/YYYY'), 'YYYY-MM-DD')
 WHERE order_date ~ '^\d{2}/\d{2}/\d{4}$';
 ```
--- Date values stored in formats DD.MM.YYYY and DD/MM/YYYY were converted to the ISO standard format YYYY-MM-DD to ensure consistency across the dataset and correct futher analysis.
-
+-- I converted date values stored in formats DD.MM.YYYY and DD/MM/YYYY to the ISO standard format YYYY-MM-DD to ensure consistency across the dataset and supports accurate time-based analysis, such as tracking monthly order volumes, sales trends, and performance within specific time periods.
 
 ## <h1 align="center">4. DUPLICATE REMOVAL AND CATEGORY STANDARDIZATION</h1>
 
-
 ## -- CUSTOMERS DASHBOARD:  Identifying Duplicate Customer Email Addresses
 
+  <p align="center">
+  <img src="images/EMAIL DUPLICATES BEFORE.png" alt="EMAIL DUPLICATES BEFORE">
+</p>
+  <p align="center">
+  <img src="images/EMAIL DUPLICATES AFTER.png" alt="EMAIL DUPLICATES BEFORE">
+</p>
 
 
 ```
@@ -362,8 +394,8 @@ WHERE emaiL IN (
     HAVING COUNT(*) > 1)
 order by email ; 
 ```
--- Duplicate customer accounts were detected based on identical email addresses.
-Duplicate customer records can cause inaccurate customer counts, duplicated marketing communication.
+-- I detected duplicate customer accounts based on identical email addresses.
+Duplicate customer records can cause inaccurate customer counts or duplicated marketing communication.
 ```
 WITH ranked AS (
   SELECT
@@ -401,17 +433,11 @@ DELETE FROM customers WHERE customer_id IN (SELECT customer_id FROM ranked WHERE
 To prevent data loss, all orders belonging to duplicate customers were reassigned to the primary customer account.
 The oldest customer account was retained while all orders from duplicate accounts were reassigned to the retained customer record.
 
-```
-SELECT LOWER(TRIM(email)) AS email_norm, COUNT(*)
-FROM customers
-GROUP BY LOWER(TRIM(email))
-HAVING COUNT(*) > 1;
-```
--- No duplicate email records remained after the cleanup process.
-
 ## -- CUSTOMERS DASHBOARD: While investigating duplicate phone numbers, several customer accounts were discovered with email addresses containing the suffix: _dup
 
-
+ <p align="center">
+  <img src="images/EMAIL DUPLICATES WITH _DUP.png" alt="EMAIL DUPLICATES WITH _DUP">
+</p>
 
  ```
 SELECT *
@@ -423,7 +449,7 @@ WHERE PHONE IN (
     HAVING COUNT(*) > 1)
 order by PHONE ; 
 ```
--- Identifying Affected Records
+-- I discovered several customer accounts with email addresses containing the _dup suffix.
 ```
 SELECT c.customer_id, c.email, COUNT(o.order_id) AS liczba_zamowien
 FROM customers c
@@ -442,26 +468,32 @@ JOIN customers orig
     ON REPLACE(dup.email, '_dup@', '@') = orig.email
 WHERE o.customer_id = dup.customer_id;
 ```
--- All orders associated with duplicate accounts were reassigned to the corresponding original customer accounts.
+-- I reassigned all orders associated with duplicate accounts to the corresponding original customer accounts.
 
+```
 DELETE FROM customers
 WHERE email ILIKE '%_dup@%';
-All unnecessary duplicate customer records were removed while maintaining order integrity.
+```
+
+-- After reassigning the orders I removed all unnecessary duplicate customer. This helped improve data quality and maintain a single customer record for each person.
+
 ## -- PROCUDTS DASHBOARD: Product Category Standardization
 
-
+ <p align="center">
+  <img src="images/CAETGORIES BEFORE.png" alt="CAETGORIES BEFORE">
+</p>
 
 ```
 SELECT DISTINCT category 
 FROM products 
 ORDER BY category;
 ```
--- The category field contained multiple representations of the same business category.
-Examples:
-electronics
-Electronics
-ELEKTRONIKA
-Elektronika
+-- The category field contained multiple representations of the same business category.<br>
+Examples:<br>
+"electronics<br>
+Electronics<br>
+ELEKTRONIKA<br>
+Elektronika"
 ```
 UPDATE products SET category = 'Elektronika'   WHERE LOWER(TRIM(category)) IN ('elektronika', 'electronics');
 UPDATE products SET category = 'Moda damska'   WHERE LOWER(TRIM(category)) IN ('moda damska', 'women fashion');
@@ -472,7 +504,11 @@ UPDATE products SET category = 'Sport'         WHERE LOWER(TRIM(category)) = 'sp
 UPDATE products SET category = 'Dziecko'       WHERE LOWER(TRIM(category)) = 'dziecko';
 UPDATE products SET category = 'Akcesoria'     WHERE LOWER(TRIM(category)) = 'akcesoria';
 ```
--- All category names were standardized into a single business-approved taxonomy. Category-level reporting became consistent and reliable. Non-standardized categories can lead to inaccurate analyses and misleading business conclusions. For example, metrics such as profit, revenue, return rates, or sales performance by category may be distorted if products are assigned inconsistently across categories.
+-- I standarlized all category names into a single business-approved taxonomy. Category-level reporting became consistent and reliable. Non-standardized categories can lead to inaccurate analyses and misleading business conclusions. For example, metrics such as profit, revenue, return rates, or sales performance by category may be distorted if products are assigned inconsistently across categories.
+
+ <p align="center">
+  <img src="images/CAETGORIES AFTER.png" alt="CAETGORIES AFTER">
+</p>
 
  
 ## -- PRODUCTS DASHBOARD: Outlier Price Detection
