@@ -75,7 +75,7 @@ FROM customers
 WHERE PHONE IS null OR PHONE = ''; 
 ```
 -- At this stage, I didn't remove phone numbers because there was insufficient information to determine the correct values.
-Records were temporarily marked as "UNKNOWN" and flagged for future business verification. <br>
+I temporarily marked these records as "UNKNOWN" and flagged for future business verification. <br>
 In the future collecting correct phone numbers may improve customer service, marketing effectiveness, and communication quality. In the next steps I will be cleaning phone number format.
 
 ```
@@ -96,7 +96,7 @@ from inventory i
 where i.stock_quantity <=0;
 
 ```
--- Products with inventory levels equal to or below zero were detected. In details, 126 affected records.
+-- I detected products with inventory levels equal to or below zero. In details, 126 affected records.
 
 ```
 alter table inventory 
